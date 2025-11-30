@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ・見積もり依頼｜株式会社ヨロズヤ</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">
+        <span class="logo-main">株式会社ヨロズヤ</span>
+        <span class="logo-sub">建設現場備品レンタル</span>
+      </div>
+      <button class="nav-toggle" aria-label="メニュー" aria-expanded="false">☰</button>
+      <nav class="global-nav" aria-label="グローバルナビゲーション">
+        <ul>
+          <li><a href="index.html">ホーム</a></li>
+          <li><a href="construction.html">建設現場向け</a></li>
+          <li><a href="event.html">イベント向け</a></li>
+          <li><a href="housing.html">単身赴任・社宅向け</a></li>
+          <li><a href="catalog.html">備品カタログ</a></li>
+          <li><a href="about.html">会社案内</a></li>
+          <li><a class="btn-primary" href="contact.html">お問い合わせ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero hero-secondary">
+      <div class="container hero-content">
+        <p class="hero-eyebrow">お気軽にご連絡ください</p>
+        <h1>お問い合わせ・見積もり依頼</h1>
+        <p class="hero-sub">電話でもフォームでもOK。受付時間：平日 9:00〜17:00。</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2>電話でのお問い合わせ</h2>
+        <div class="callout">
+          <p class="large">電話：018-888-8398 / 018-888-8341</p>
+          <p>お電話の際は、以下の内容をお伝えいただくとスムーズです。</p>
+          <ul class="bullet-list">
+            <li>現場名</li>
+            <li>現場の場所（市区町村）</li>
+            <li>人数</li>
+            <li>開始予定日</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="estimate-form">
+      <div class="container">
+        <h2>フォームでのお問い合わせ</h2>
+        <form class="contact-form">
+          <div class="form-grid">
+            <label>会社名*<input type="text" name="company" required></label>
+            <label>お名前*<input type="text" name="name" required></label>
+            <label>電話番号*<input type="tel" name="tel" required></label>
+            <label>メールアドレス*<input type="email" name="email" required></label>
+          </div>
+
+          <fieldset>
+            <legend>利用目的</legend>
+            <label><input type="radio" name="purpose" value="建設現場" checked> 建設現場</label>
+            <label><input type="radio" name="purpose" value="イベント"> イベント</label>
+            <label><input type="radio" name="purpose" value="単身赴任・社宅"> 単身赴任・社宅</label>
+            <label><input type="radio" name="purpose" value="その他"> その他</label>
+          </fieldset>
+
+          <div class="form-grid">
+            <label>現場名／案件名<input type="text" name="project"></label>
+            <label>現場住所<input type="text" name="address"></label>
+            <label>利用開始予定日<input type="date" name="start"></label>
+            <label>利用期間<input type="text" name="duration" placeholder="例：3ヶ月程度"></label>
+            <label>想定人数<input type="number" name="people"></label>
+          </div>
+
+          <fieldset>
+            <legend>必要なカテゴリ</legend>
+            <label><input type="checkbox" name="category" value="事務机・椅子"> 事務机・椅子</label>
+            <label><input type="checkbox" name="category" value="OA機器"> OA機器</label>
+            <label><input type="checkbox" name="category" value="空調機器"> 空調機器</label>
+            <label><input type="checkbox" name="category" value="生活家電"> 生活家電</label>
+            <label><input type="checkbox" name="category" value="その他"> その他</label>
+          </fieldset>
+
+          <div class="form-grid">
+            <label>ご予算感<input type="text" name="budget"></label>
+          </div>
+
+          <label>自由記入欄<textarea name="message" rows="5"></textarea></label>
+
+          <button class="btn-primary" type="submit">送信する</button>
+        </form>
+        <p class="form-feedback" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <div class="mobile-float">
+    <a href="tel:0188888398">📞 電話相談</a>
+    <a href="#estimate-form">📝 見積もり依頼</a>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div>
+        <h4>会社情報</h4>
+        <p>株式会社ヨロズヤ<br>〒010-1653 秋田県秋田市豊岩小山字狐森325</p>
+        <p>電話：018-888-8398 / 018-888-8341<br>FAX：018-888-8342</p>
+      </div>
+      <div class="footer-meta">
+        <p>© 2025 株式会社ヨロズヤ All Rights Reserved.</p>
+        <p class="small">プライバシーポリシー</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
