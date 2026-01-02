@@ -148,6 +148,68 @@
                 <p>上の「+ 新しいタスクを追加」ボタンをクリックして、最初のタスクを作成しましょう。</p>
             </div>
         </div>
+
+        <!-- カレンダービュー -->
+        <div class="calendar-container">
+            <div class="calendar-header-section">
+                <h2>📅 カレンダービュー</h2>
+                <div class="calendar-view-tabs">
+                    <button class="calendar-tab active" data-view="month">月間</button>
+                    <button class="calendar-tab" data-view="week">週間</button>
+                    <button class="calendar-tab" data-view="day">1日</button>
+                </div>
+            </div>
+
+            <div class="calendar-navigation">
+                <button class="calendar-nav-btn" id="prevPeriod">‹ 前</button>
+                <h3 id="currentPeriod">2026年1月</h3>
+                <button class="calendar-nav-btn" id="nextPeriod">次 ›</button>
+                <button class="calendar-nav-btn today-btn" id="todayBtn">今日</button>
+            </div>
+
+            <!-- 月間ビュー -->
+            <div class="calendar-view" id="monthView">
+                <div class="calendar-weekdays">
+                    <div class="weekday">日</div>
+                    <div class="weekday">月</div>
+                    <div class="weekday">火</div>
+                    <div class="weekday">水</div>
+                    <div class="weekday">木</div>
+                    <div class="weekday">金</div>
+                    <div class="weekday">土</div>
+                </div>
+                <div class="calendar-days" id="monthDays">
+                    <!-- 日付がここに動的に表示されます -->
+                </div>
+            </div>
+
+            <!-- 週間ビュー -->
+            <div class="calendar-view hidden" id="weekView">
+                <div class="calendar-weekdays">
+                    <div class="weekday time-col">時間</div>
+                    <div class="weekday">日</div>
+                    <div class="weekday">月</div>
+                    <div class="weekday">火</div>
+                    <div class="weekday">水</div>
+                    <div class="weekday">木</div>
+                    <div class="weekday">金</div>
+                    <div class="weekday">土</div>
+                </div>
+                <div class="calendar-week-grid" id="weekGrid">
+                    <!-- 週間カレンダーがここに動的に表示されます -->
+                </div>
+            </div>
+
+            <!-- 1日ビュー -->
+            <div class="calendar-view hidden" id="dayView">
+                <div class="calendar-day-header" id="dayHeader">
+                    <!-- 日付ヘッダーがここに表示されます -->
+                </div>
+                <div class="calendar-day-grid" id="dayGrid">
+                    <!-- 1日のタスクがここに動的に表示されます -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/task-manager.js"></script>

@@ -62,6 +62,8 @@ class AuthSystem {
         // TaskManagerを初期化
         if (!window.taskManager) {
             window.taskManager = new TaskManager();
+            // CalendarViewを初期化
+            window.calendarView = new CalendarView(window.taskManager);
         }
     }
 
@@ -387,12 +389,295 @@ class TaskManager {
         }
 
         this.updateStats();
+
+        // カレンダービューも更新
+        if (window.calendarView) {
+            window.calendarView.refresh();
+        }
+    }
+}
+
+// カレンダービュー
+class CalendarView {
+    constructor(taskManager) {
+        this.taskManager = taskManager;
+        this.currentDate = new Date();
+        this.currentView = 'month'; // 'month', 'week', 'day'
+        this.initializeElements();
+        this.attachEventListeners();
+        this.render();
+    }
+
+    initializeElements() {
+        this.monthView = document.getElementById('monthView');
+        this.weekView = document.getElementById('weekView');
+        this.dayView = document.getElementById('dayView');
+        this.currentPeriodEl = document.getElementById('currentPeriod');
+        this.monthDays = document.getElementById('monthDays');
+        this.weekGrid = document.getElementById('weekGrid');
+        this.dayGrid = document.getElementById('dayGrid');
+        this.dayHeader = document.getElementById('dayHeader');
+    }
+
+    attachEventListeners() {
+        // ビュー切り替えタブ
+        document.querySelectorAll('.calendar-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const view = e.target.dataset.view;
+                this.switchView(view);
+            });
+        });
+
+        // ナビゲーションボタン
+        document.getElementById('prevPeriod').addEventListener('click', () => this.navigate(-1));
+        document.getElementById('nextPeriod').addEventListener('click', () => this.navigate(1));
+        document.getElementById('todayBtn').addEventListener('click', () => this.goToToday());
+    }
+
+    switchView(view) {
+        this.currentView = view;
+
+        // タブの状態を更新
+        document.querySelectorAll('.calendar-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.view === view);
+        });
+
+        // ビューの表示/非表示
+        this.monthView.classList.toggle('hidden', view !== 'month');
+        this.weekView.classList.toggle('hidden', view !== 'week');
+        this.dayView.classList.toggle('hidden', view !== 'day');
+
+        this.render();
+    }
+
+    navigate(direction) {
+        if (this.currentView === 'month') {
+            this.currentDate.setMonth(this.currentDate.getMonth() + direction);
+        } else if (this.currentView === 'week') {
+            this.currentDate.setDate(this.currentDate.getDate() + (direction * 7));
+        } else if (this.currentView === 'day') {
+            this.currentDate.setDate(this.currentDate.getDate() + direction);
+        }
+        this.render();
+    }
+
+    goToToday() {
+        this.currentDate = new Date();
+        this.render();
+    }
+
+    render() {
+        this.updatePeriodLabel();
+
+        if (this.currentView === 'month') {
+            this.renderMonthView();
+        } else if (this.currentView === 'week') {
+            this.renderWeekView();
+        } else if (this.currentView === 'day') {
+            this.renderDayView();
+        }
+    }
+
+    updatePeriodLabel() {
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth() + 1;
+        const day = this.currentDate.getDate();
+
+        if (this.currentView === 'month') {
+            this.currentPeriodEl.textContent = `${year}年${month}月`;
+        } else if (this.currentView === 'week') {
+            const weekStart = this.getWeekStart(this.currentDate);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            this.currentPeriodEl.textContent = `${weekStart.getMonth() + 1}/${weekStart.getDate()} - ${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+        } else if (this.currentView === 'day') {
+            this.currentPeriodEl.textContent = `${year}年${month}月${day}日`;
+        }
+    }
+
+    getWeekStart(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diff = d.getDate() - day;
+        return new Date(d.setDate(diff));
+    }
+
+    renderMonthView() {
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startDate = new Date(firstDay);
+        startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+        const days = [];
+        const totalCells = 42; // 6週間分
+
+        for (let i = 0; i < totalCells; i++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + i);
+            days.push(this.createDayCell(currentDate, month));
+        }
+
+        this.monthDays.innerHTML = days.join('');
+    }
+
+    createDayCell(date, currentMonth) {
+        const isToday = this.isSameDay(date, new Date());
+        const isOtherMonth = date.getMonth() !== currentMonth;
+        const tasksOnDay = this.getTasksForDate(date);
+
+        const classes = ['calendar-day'];
+        if (isToday) classes.push('today');
+        if (isOtherMonth) classes.push('other-month');
+
+        const taskItems = tasksOnDay.slice(0, 3).map(task => `
+            <div class="calendar-task-item priority-${task.priority}" onclick="taskManager.editTask('${task.id}')">
+                ${this.escapeHtml(task.title)}
+            </div>
+        `).join('');
+
+        const moreCount = tasksOnDay.length > 3 ? `
+            <div class="task-count">+${tasksOnDay.length - 3}件</div>
+        ` : '';
+
+        return `
+            <div class="${classes.join(' ')}">
+                <div class="day-number">${date.getDate()}</div>
+                <div class="calendar-tasks">
+                    ${taskItems}
+                    ${moreCount}
+                </div>
+            </div>
+        `;
+    }
+
+    renderWeekView() {
+        const weekStart = this.getWeekStart(this.currentDate);
+        const hours = Array.from({length: 24}, (_, i) => i);
+
+        let html = '';
+        hours.forEach(hour => {
+            html += `<div class="week-time-slot">${hour}:00</div>`;
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(weekStart);
+                date.setDate(weekStart.getDate() + i);
+                const tasks = this.getTasksForDate(date);
+                const taskItems = tasks.map(task => `
+                    <div class="calendar-task-item priority-${task.priority}" onclick="taskManager.editTask('${task.id}')">
+                        ${this.escapeHtml(task.title)}
+                    </div>
+                `).join('');
+                html += `<div class="week-day-slot">${taskItems}</div>`;
+            }
+        });
+
+        this.weekGrid.innerHTML = html;
+    }
+
+    renderDayView() {
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth() + 1;
+        const day = this.currentDate.getDate();
+        const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+        const weekday = weekdays[this.currentDate.getDay()];
+
+        this.dayHeader.innerHTML = `
+            <h3>${year}年${month}月${day}日 (${weekday})</h3>
+        `;
+
+        const tasks = this.getTasksForDate(this.currentDate);
+
+        if (tasks.length === 0) {
+            this.dayGrid.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📅</div>
+                    <h3>この日のタスクはありません</h3>
+                </div>
+            `;
+        } else {
+            const taskCards = tasks.map(task => `
+                <div class="day-task-card">
+                    <div class="task-header">
+                        <input type="checkbox"
+                               class="task-checkbox"
+                               ${task.completed ? 'checked' : ''}
+                               onchange="taskManager.toggleTaskComplete('${task.id}')">
+                        <div class="task-content">
+                            <div class="task-title">${this.escapeHtml(task.title)}</div>
+                            ${task.description ? `<div class="task-description">${this.escapeHtml(task.description)}</div>` : ''}
+                            <div class="task-meta">
+                                <span class="task-badge priority-${task.priority}">
+                                    優先度: ${this.getPriorityLabel(task.priority)}
+                                </span>
+                                <span class="category-badge">
+                                    ${this.getCategoryLabel(task.category)}
+                                </span>
+                            </div>
+                            <div class="task-actions">
+                                <button class="btn-edit" onclick="taskManager.editTask('${task.id}')">編集</button>
+                                <button class="btn-delete" onclick="taskManager.deleteTask('${task.id}')">削除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            this.dayGrid.innerHTML = `<div class="day-task-list">${taskCards}</div>`;
+        }
+    }
+
+    getTasksForDate(date) {
+        return this.taskManager.tasks.filter(task => {
+            if (!task.deadline) return false;
+            const taskDate = new Date(task.deadline);
+            return this.isSameDay(taskDate, date);
+        }).sort((a, b) => {
+            const priorityOrder = { high: 0, medium: 1, low: 2 };
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
+        });
+    }
+
+    isSameDay(date1, date2) {
+        return date1.getFullYear() === date2.getFullYear() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getDate() === date2.getDate();
+    }
+
+    getPriorityLabel(priority) {
+        const labels = { high: '高', medium: '中', low: '低' };
+        return labels[priority] || priority;
+    }
+
+    getCategoryLabel(category) {
+        const labels = {
+            meeting: '会議',
+            project: 'プロジェクト',
+            decision: '重要決定',
+            delegation: 'デリゲーション',
+            finance: '財務',
+            strategy: '戦略',
+            other: 'その他'
+        };
+        return labels[category] || category;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // タスクが更新されたときにカレンダーを再描画
+    refresh() {
+        this.render();
     }
 }
 
 // アプリケーションの初期化
 let taskManager;
 let authSystem;
+let calendarView;
 document.addEventListener('DOMContentLoaded', () => {
     authSystem = new AuthSystem();
     // taskManagerは認証成功後にAuthSystem内で初期化されます
