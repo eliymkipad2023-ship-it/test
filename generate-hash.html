@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>パスワードハッシュ生成</title>
+</head>
+<body>
+    <h1>パスワードハッシュ生成ツール</h1>
+    <input type="text" id="password" placeholder="パスワードを入力">
+    <button onclick="generateHash()">ハッシュ生成</button>
+    <p id="result"></p>
+    <script>
+        async function generateHash() {
+            const password = document.getElementById('password').value;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            document.getElementById('result').textContent = 'ハッシュ: ' + hash;
+        }
+    </script>
+</body>
+</html>

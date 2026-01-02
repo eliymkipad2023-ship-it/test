@@ -7,10 +7,36 @@
     <link rel="stylesheet" href="css/task-manager.css">
 </head>
 <body>
-    <div class="container">
+    <!-- 認証画面 -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>🔐 経営者タスク管理</h1>
+                <p>アクセスするにはパスワードを入力してください</p>
+            </div>
+            <form id="authForm" class="auth-form">
+                <div class="auth-form-group">
+                    <input type="password" id="passwordInput" placeholder="パスワードを入力" required autocomplete="off">
+                </div>
+                <button type="submit" class="auth-btn">ログイン</button>
+                <div id="authError" class="auth-error hidden">パスワードが正しくありません</div>
+            </form>
+            <div class="auth-footer">
+                <small>セキュアな経営者専用タスク管理システム</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインアプリケーション（認証後に表示） -->
+    <div class="container" id="mainApp" style="display: none;">
         <header>
-            <h1>📊 経営者タスク管理</h1>
-            <p class="subtitle">効率的なタスク管理で生産性を最大化</p>
+            <div class="header-content">
+                <div>
+                    <h1>📊 経営者タスク管理</h1>
+                    <p class="subtitle">効率的なタスク管理で生産性を最大化</p>
+                </div>
+                <button id="logoutBtn" class="logout-btn">ログアウト</button>
+            </div>
         </header>
 
         <div class="stats-dashboard">

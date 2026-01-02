@@ -1,3 +1,78 @@
+// 認証システム
+class AuthSystem {
+    constructor() {
+        // パスワードのSHA-256ハッシュ値（初期パスワード: "executive2026"）
+        // 変更したい場合は、generate-hash.htmlを使用してハッシュを生成してください
+        this.passwordHash = '586786c065792db54a5b97bab65e4373a023b3825076196bd1800c6a7c9aa811';
+        this.sessionKey = 'executiveTaskAuth';
+
+        this.initAuth();
+    }
+
+    async hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    initAuth() {
+        const authForm = document.getElementById('authForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // セッションチェック
+        if (this.isAuthenticated()) {
+            this.showMainApp();
+        }
+
+        // ログインフォーム送信
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('passwordInput').value;
+            const hash = await this.hashPassword(password);
+
+            if (hash === this.passwordHash) {
+                sessionStorage.setItem(this.sessionKey, 'authenticated');
+                this.showMainApp();
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('authError').classList.add('hidden');
+            } else {
+                document.getElementById('authError').classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+            }
+        });
+
+        // ログアウト
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                this.logout();
+            });
+        }
+    }
+
+    isAuthenticated() {
+        return sessionStorage.getItem(this.sessionKey) === 'authenticated';
+    }
+
+    showMainApp() {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+
+        // TaskManagerを初期化
+        if (!window.taskManager) {
+            window.taskManager = new TaskManager();
+        }
+    }
+
+    logout() {
+        sessionStorage.removeItem(this.sessionKey);
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('passwordInput').value = '';
+    }
+}
+
 // タスク管理アプリケーション
 class TaskManager {
     constructor() {
@@ -317,6 +392,8 @@ class TaskManager {
 
 // アプリケーションの初期化
 let taskManager;
+let authSystem;
 document.addEventListener('DOMContentLoaded', () => {
-    taskManager = new TaskManager();
+    authSystem = new AuthSystem();
+    // taskManagerは認証成功後にAuthSystem内で初期化されます
 });
