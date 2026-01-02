@@ -149,7 +149,18 @@ class TaskManager {
             this.taskDescriptionInput.value = task.description || '';
             this.taskPriorityInput.value = task.priority;
             this.taskCategoryInput.value = task.category;
-            this.taskDeadlineInput.value = task.deadline || '';
+            // datetime-local形式に変換（YYYY-MM-DDTHH:mm）
+            if (task.deadline) {
+                const date = new Date(task.deadline);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                this.taskDeadlineInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            } else {
+                this.taskDeadlineInput.value = '';
+            }
         } else {
             this.editingTaskId = null;
             this.formTitle.textContent = '新しいタスクを追加';
@@ -158,6 +169,9 @@ class TaskManager {
 
         this.taskForm.classList.remove('hidden');
         this.btnShowForm.style.display = 'none';
+
+        // フォームまでスクロール
+        this.taskForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         this.taskTitleInput.focus();
     }
 
@@ -274,10 +288,9 @@ class TaskManager {
     // 期限が過ぎているかチェック
     isOverdue(deadline) {
         if (!deadline) return false;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const now = new Date();
         const deadlineDate = new Date(deadline);
-        return deadlineDate < today;
+        return deadlineDate < now;
     }
 
     // 日付をフォーマット
@@ -287,7 +300,14 @@ class TaskManager {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
-        return `${year}/${month}/${day}`;
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        // 時刻が00:00の場合は日付のみ表示
+        if (hours === '00' && minutes === '00') {
+            return `${year}/${month}/${day}`;
+        }
+        return `${year}/${month}/${day} ${hours}:${minutes}`;
     }
 
     // カテゴリー名を日本語で取得
@@ -432,6 +452,40 @@ class CalendarView {
         document.getElementById('prevPeriod').addEventListener('click', () => this.navigate(-1));
         document.getElementById('nextPeriod').addEventListener('click', () => this.navigate(1));
         document.getElementById('todayBtn').addEventListener('click', () => this.goToToday());
+
+        // カレンダーアイテムのクリックイベント（イベント委譲）
+        const calendarContainer = document.querySelector('.calendar-container');
+        calendarContainer.addEventListener('click', (e) => {
+            // カレンダータスクアイテムがクリックされた場合
+            const taskItem = e.target.closest('.calendar-task-item');
+            if (taskItem && taskItem.dataset.taskId) {
+                e.preventDefault();
+                this.taskManager.editTask(taskItem.dataset.taskId);
+                return;
+            }
+
+            // 編集・削除ボタンがクリックされた場合
+            const editBtn = e.target.closest('.btn-edit');
+            if (editBtn && editBtn.dataset.taskId) {
+                e.preventDefault();
+                this.taskManager.editTask(editBtn.dataset.taskId);
+                return;
+            }
+
+            const deleteBtn = e.target.closest('.btn-delete');
+            if (deleteBtn && deleteBtn.dataset.taskId) {
+                e.preventDefault();
+                this.taskManager.deleteTask(deleteBtn.dataset.taskId);
+                return;
+            }
+        });
+
+        // チェックボックスの変更イベント（イベント委譲）
+        calendarContainer.addEventListener('change', (e) => {
+            if (e.target.classList.contains('task-checkbox') && e.target.dataset.taskId) {
+                this.taskManager.toggleTaskComplete(e.target.dataset.taskId);
+            }
+        });
     }
 
     switchView(view) {
@@ -532,7 +586,7 @@ class CalendarView {
         if (isOtherMonth) classes.push('other-month');
 
         const taskItems = tasksOnDay.slice(0, 3).map(task => `
-            <div class="calendar-task-item priority-${task.priority}" onclick="taskManager.editTask('${task.id}')">
+            <div class="calendar-task-item priority-${task.priority}" data-task-id="${task.id}">
                 ${this.escapeHtml(task.title)}
             </div>
         `).join('');
@@ -564,7 +618,7 @@ class CalendarView {
                 date.setDate(weekStart.getDate() + i);
                 const tasks = this.getTasksForDate(date);
                 const taskItems = tasks.map(task => `
-                    <div class="calendar-task-item priority-${task.priority}" onclick="taskManager.editTask('${task.id}')">
+                    <div class="calendar-task-item priority-${task.priority}" data-task-id="${task.id}">
                         ${this.escapeHtml(task.title)}
                     </div>
                 `).join('');
@@ -602,7 +656,7 @@ class CalendarView {
                         <input type="checkbox"
                                class="task-checkbox"
                                ${task.completed ? 'checked' : ''}
-                               onchange="taskManager.toggleTaskComplete('${task.id}')">
+                               data-task-id="${task.id}">
                         <div class="task-content">
                             <div class="task-title">${this.escapeHtml(task.title)}</div>
                             ${task.description ? `<div class="task-description">${this.escapeHtml(task.description)}</div>` : ''}
@@ -615,8 +669,8 @@ class CalendarView {
                                 </span>
                             </div>
                             <div class="task-actions">
-                                <button class="btn-edit" onclick="taskManager.editTask('${task.id}')">編集</button>
-                                <button class="btn-delete" onclick="taskManager.deleteTask('${task.id}')">削除</button>
+                                <button class="btn-edit" data-task-id="${task.id}">編集</button>
+                                <button class="btn-delete" data-task-id="${task.id}">削除</button>
                             </div>
                         </div>
                     </div>
