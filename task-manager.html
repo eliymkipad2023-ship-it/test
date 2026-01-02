@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>経営者タスク管理 | Executive Task Manager</title>
+    <link rel="stylesheet" href="css/task-manager.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 経営者タスク管理</h1>
+            <p class="subtitle">効率的なタスク管理で生産性を最大化</p>
+        </header>
+
+        <div class="stats-dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">総タスク数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">完了</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingTasks">0</div>
+                <div class="stat-label">未完了</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="highPriorityTasks">0</div>
+                <div class="stat-label">高優先度</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 タスクを検索...">
+            </div>
+            <div class="filter-controls">
+                <select id="filterPriority">
+                    <option value="all">すべての優先度</option>
+                    <option value="high">高</option>
+                    <option value="medium">中</option>
+                    <option value="low">低</option>
+                </select>
+                <select id="filterCategory">
+                    <option value="all">すべてのカテゴリー</option>
+                    <option value="meeting">会議</option>
+                    <option value="project">プロジェクト</option>
+                    <option value="decision">重要決定</option>
+                    <option value="delegation">デリゲーション</option>
+                    <option value="finance">財務</option>
+                    <option value="strategy">戦略</option>
+                    <option value="other">その他</option>
+                </select>
+                <select id="filterStatus">
+                    <option value="all">すべてのステータス</option>
+                    <option value="pending">未完了</option>
+                    <option value="completed">完了</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="task-form-container">
+            <button class="btn-add-task" id="btnShowForm">+ 新しいタスクを追加</button>
+
+            <form id="taskForm" class="task-form hidden">
+                <h3 id="formTitle">新しいタスクを追加</h3>
+                <div class="form-group">
+                    <label for="taskTitle">タスク名 *</label>
+                    <input type="text" id="taskTitle" required placeholder="例: 重要な会議の準備">
+                </div>
+
+                <div class="form-group">
+                    <label for="taskDescription">詳細</label>
+                    <textarea id="taskDescription" rows="3" placeholder="タスクの詳細を入力..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">優先度 *</label>
+                        <select id="taskPriority" required>
+                            <option value="high">高</option>
+                            <option value="medium" selected>中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskCategory">カテゴリー *</label>
+                        <select id="taskCategory" required>
+                            <option value="meeting">会議</option>
+                            <option value="project">プロジェクト</option>
+                            <option value="decision">重要決定</option>
+                            <option value="delegation">デリゲーション</option>
+                            <option value="finance">財務</option>
+                            <option value="strategy">戦略</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDeadline">期限</label>
+                        <input type="date" id="taskDeadline">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <button type="button" class="btn btn-secondary" id="btnCancelForm">キャンセル</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="tasks-container">
+            <div id="tasksList" class="tasks-list">
+                <!-- タスクがここに動的に表示されます -->
+            </div>
+            <div id="emptyState" class="empty-state">
+                <div class="empty-icon">📝</div>
+                <h3>タスクがありません</h3>
+                <p>上の「+ 新しいタスクを追加」ボタンをクリックして、最初のタスクを作成しましょう。</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/task-manager.js"></script>
+</body>
+</html>
