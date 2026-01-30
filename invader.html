@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>インベーダーゲーム｜株式会社ヨロズヤ</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">
+        <span class="logo-main">株式会社ヨロズヤ</span>
+        <span class="logo-sub">建設現場備品レンタル</span>
+      </div>
+      <button class="nav-toggle" aria-label="メニュー" aria-expanded="false">☰</button>
+      <nav class="global-nav" aria-label="グローバルナビゲーション">
+        <ul>
+          <li><a href="index.html">ホーム</a></li>
+          <li><a href="construction.html">建設現場向け</a></li>
+          <li><a href="event.html">イベント向け</a></li>
+          <li><a href="housing.html">単身赴任・社宅向け</a></li>
+          <li><a href="catalog.html">備品カタログ</a></li>
+          <li><a href="about.html">会社案内</a></li>
+          <li><a href="invader.html">インベーダーゲーム</a></li>
+          <li><a class="btn-primary" href="contact.html">お問い合わせ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section invader-hero">
+      <div class="container">
+        <p class="hero-eyebrow">ちょっとした息抜きに</p>
+        <h1>ヨロズヤ・インベーダーゲーム</h1>
+        <p class="hero-sub">矢印キーで移動、スペースキーで攻撃。全てのインベーダーを撃破してスコアを更新しましょう。</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container invader-layout">
+        <div class="invader-panel">
+          <div class="invader-stats">
+            <div>
+              <span class="stat-label">スコア</span>
+              <span id="score" class="stat-value">0</span>
+            </div>
+            <div>
+              <span class="stat-label">ライフ</span>
+              <span id="lives" class="stat-value">3</span>
+            </div>
+            <div>
+              <span class="stat-label">レベル</span>
+              <span id="level" class="stat-value">1</span>
+            </div>
+          </div>
+          <div class="invader-controls">
+            <button id="start-button" class="btn-primary" type="button">スタート</button>
+            <button id="pause-button" class="btn-outline" type="button">一時停止</button>
+            <button id="restart-button" class="btn-outline" type="button">リスタート</button>
+          </div>
+          <div class="invader-instructions">
+            <h2>操作方法</h2>
+            <ul class="bullet-list">
+              <li>← → または A / D：移動</li>
+              <li>Space：ショット</li>
+              <li>Enter：スタート / 一時停止</li>
+            </ul>
+          </div>
+        </div>
+        <div class="invader-stage">
+          <canvas id="invader-canvas" width="720" height="480" aria-label="インベーダーゲーム"></canvas>
+          <p class="canvas-fallback">お使いのブラウザではゲームを表示できません。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div>
+        <h4>会社情報</h4>
+        <p>株式会社ヨロズヤ<br>〒010-1653 秋田県秋田市豊岩小山字狐森325</p>
+        <p>電話：018-888-8398 / 018-888-8341<br>FAX：018-888-8342</p>
+      </div>
+      <div class="footer-meta">
+        <p>© 2025 株式会社ヨロズヤ All Rights Reserved.</p>
+        <p class="small">プライバシーポリシー</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/invader.js"></script>
+</body>
+</html>
